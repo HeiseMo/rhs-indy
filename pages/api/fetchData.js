@@ -19,8 +19,6 @@ export default async (req, res) => {
     const planetData = (await parseCSV(path.join(publicDir, 'PlanetaryProduction.csv'))).slice(1);
     const systemData = (await parseCSV(path.join(publicDir, 'Systems.csv'))).slice(1);
     
-    console.log("First few planetData:", planetData.slice(0, 3));
-console.log("First few systemData:", systemData.slice(0, 3));
 let integratedData = planetData.map(planet => {
     const relatedSystem = systemData.find(system => system._4 === planet._3);
     return {
@@ -55,7 +53,6 @@ let integratedData = planetData.map(planet => {
 
     if (system) {
         integratedData = integratedData.filter(item => item.System?.toLowerCase().includes(system.toLowerCase()));
-        console.log(integratedData)
     }
 
     res.status(200).json(integratedData);

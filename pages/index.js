@@ -9,10 +9,8 @@ function HomePage() {
 
   const fetchDataFromAPI = async (filters) => {
     const queryParams = new URLSearchParams(filters).toString();
-    console.log(queryParams, "params")
     const response = await fetch(`/api/fetchData?${queryParams}`);
     const fetchedData = await response.json();
-    console.log(fetchedData, "fetched data")
     setData(fetchedData);
   };
 
