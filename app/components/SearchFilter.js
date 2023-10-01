@@ -7,17 +7,24 @@ const SearchFilter = ({ onFilter }) => {
     const [systemInput, setSystemInput] = useState('');
 
     const handleInputChange = (field, value) => {
+        let updatedFilters = {
+          region: regionInput,
+          constellation: constellationInput,
+          system: systemInput
+        };
+    
+        if (field === 'region') updatedFilters.region = value;
+        if (field === 'constellation') updatedFilters.constellation = value;
+        if (field === 'system') updatedFilters.system = value;
+    
+        onFilter(updatedFilters);  // Use the updated filters directly, without waiting for state update
+    
+        // You can still update the state for controlled components
         if (field === 'region') setRegionInput(value);
         if (field === 'constellation') setConstellationInput(value);
         if (field === 'system') setSystemInput(value);
-
-        onFilter({
-            region: regionInput,
-            constellation: constellationInput,
-            system: systemInput
-        });
-
-        console.log({ regionInput, constellationInput, systemInput }); // Logging the current filter values
+    
+        console.log(updatedFilters, 'updatedFilters');
     };
 
     return (

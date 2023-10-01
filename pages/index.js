@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
-import { Container, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Button } from '@mui/material';
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@mui/material';
 import SearchFilter from '../app/components/SearchFilter';
-import path from 'path';
-import fs from 'fs';
-import csv from 'csv-parser';
 
-function HomePage({ initialData }) {
-  const [data, setData] = useState(initialData);
+function HomePage() {
+  const [data, setData] = useState([]);
+  const [filters, setFilters] = useState({});
 
-  const handleFilter = (filters) => {
-    let filteredData = [...initialData];
+  const fetchDataFromAPI = async (filters) => {
+    const queryParams = new URLSearchParams(filters).toString();
+    console.log(queryParams, "params")
+    const response = await fetch(`/api/fetchData?${queryParams}`);
+    const fetchedData = await response.json();
+    console.log(fetchedData, "fetched data")
+    setData(fetchedData);
+  };
 
-    Object.keys(filters).forEach(key => {
-      if (filters[key]) {
-        filteredData = filteredData.filter(item =>
-          item[key]?.toLowerCase().includes(filters[key].toLowerCase())
-        );
-      }
-    });
-
-    setData(filteredData);
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters);
   };
 
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
         Planetary Resources Finder
+
       </Typography>
 
       <SearchFilter onFilter={handleFilter} />
-
+      <Button variant="contained" color="primary" onClick={() => fetchDataFromAPI(filters)}>
+        Submit
+      </Button>
       <Paper>
         <Table>
           <TableHead>
@@ -65,32 +65,6 @@ function HomePage({ initialData }) {
       </Paper>
     </Container>
   );
-}
-
-export async function getStaticProps() {
-  const publicDir = path.join(process.cwd(), 'public');
-
-  const parseCSV = filepath => {
-    const results = [];
-    return new Promise((resolve) => {
-      fs.createReadStream(filepath)
-        .pipe(csv({ headers: true, skip_empty_lines: true }))
-        .on('data', (data) => results.push(data))
-        .on('end', () => resolve(results));
-    });
-  };
-
-  const planetData = await parseCSV(path.join(publicDir, 'PlanetaryProduction.csv'));
-  const systemData = await parseCSV(path.join(publicDir, 'Systems.csv'));
-
-  const integratedData = planetData.map(planet => {
-    const relatedSystem = systemData.find(system => system.Name === planet.System);
-    return { ...planet, ...relatedSystem };
-  });
-
-  return {
-    props: { initialData: integratedData }
-  };
 }
 
 export default HomePage;
