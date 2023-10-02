@@ -1,70 +1,79 @@
 import React, { useState } from 'react';
-import { Button, TextField, Grid } from '@mui/material';
+import { TextField, Grid } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const SearchFilter = ({ onFilter }) => {
+const StyledTextField = styled(TextField)({
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'rgba(255, 255, 255, 0.1)', // Subtle border
+      },
+      '&:hover fieldset': {
+        borderColor: '#e5b50a', // Gold tone for hover effect
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#e5b50a', // Gold tone when focused
+      },
+    },
+    '& .MuiInputLabel-root': {
+      color: '#e5e5e5',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#e5b50a', // Gold tone when label is above (after focusing)
+    },
+    '& .MuiInputBase-input': {
+      color: '#e5e5e5',
+    },
+  });
+  
+
+function SearchFilter({ onFilter }) {
     const [regionInput, setRegionInput] = useState('');
     const [constellationInput, setConstellationInput] = useState('');
     const [systemInput, setSystemInput] = useState('');
 
     const handleInputChange = (field, value) => {
-        let updatedFilters = {
-          region: regionInput,
-          constellation: constellationInput,
-          system: systemInput
+        const updatedFilters = {
+            region: regionInput,
+            constellation: constellationInput,
+            system: systemInput,
         };
-    
-        if (field === 'region') updatedFilters.region = value;
-        if (field === 'constellation') updatedFilters.constellation = value;
-        if (field === 'system') updatedFilters.system = value;
-    
-        onFilter(updatedFilters);  // Use the updated filters directly, without waiting for state update
-    
-        // You can still update the state for controlled components
+        updatedFilters[field] = value;
+        onFilter(updatedFilters);
+
         if (field === 'region') setRegionInput(value);
         if (field === 'constellation') setConstellationInput(value);
         if (field === 'system') setSystemInput(value);
-    
-        console.log(updatedFilters, 'updatedFilters');
     };
 
     return (
         <Grid container spacing={3}>
             <Grid item xs={12} sm={4}>
-                <TextField
+                <StyledTextField
                     fullWidth
                     label="Region"
                     variant="outlined"
                     value={regionInput}
-                    onChange={(e) => {
-                        console.log("Region input:", e.target.value); // Logging for debugging
-                        handleInputChange('region', e.target.value);
-                    }}
+                    onChange={(e) => handleInputChange('region', e.target.value)}
                 />
             </Grid>
 
             <Grid item xs={12} sm={4}>
-                <TextField
+                <StyledTextField
                     fullWidth
                     label="Constellation"
                     variant="outlined"
                     value={constellationInput}
-                    onChange={(e) => {
-                        console.log("Constellation input:", e.target.value); // Logging for debugging
-                        handleInputChange('constellation', e.target.value);
-                    }}
+                    onChange={(e) => handleInputChange('constellation', e.target.value)}
                 />
             </Grid>
 
             <Grid item xs={12} sm={4}>
-                <TextField
+                <StyledTextField
                     fullWidth
                     label="System"
                     variant="outlined"
                     value={systemInput}
-                    onChange={(e) => {
-                        console.log("System input:", e.target.value); // Logging for debugging
-                        handleInputChange('system', e.target.value);
-                    }}
+                    onChange={(e) => handleInputChange('system', e.target.value)}
                 />
             </Grid>
         </Grid>

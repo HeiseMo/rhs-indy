@@ -1,7 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button } from '@mui/material';
+import { Container, Typography, Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@mui/material';
 import SearchFilter from '../app/components/SearchFilter';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#e5b50a', // Gold tone
+    },
+    background: {
+      default: '#3d3d3d',
+      paper: '#1e1f3281',
+    },
+    text: {
+      primary: '#e5e5e5',
+      secondary: '#e5b50a',
+    },
+  },
+  typography: {
+    h4: {
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        containedPrimary: {
+          '&:hover': {
+            backgroundColor: '#c7d0df',
+          },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderColor: 'rgba(255, 255, 255, 0.1)', // Subtle border
+        },
+      },
+    },
+  },
+});
 
 function HomePage() {
   const [data, setData] = useState([]);
@@ -20,22 +59,24 @@ function HomePage() {
     loadDataIfNeeded();
   }, []);
 
-  const fetchDataFromAPI = async (filters) => {
-    const queryParams = new URLSearchParams(filters).toString();
-    const response = await fetch(`/api/fetchData?${queryParams}`);
-    const fetchedData = await response.json();
-    setData(fetchedData);
-  };
+    const fetchDataFromAPI = async (filters) => {
+      const queryParams = new URLSearchParams(filters).toString();
+      const response = await fetch(`/api/fetchData?${queryParams}`);
+      const fetchedData = await response.json();
+      setData(fetchedData);
+    };
 
-  const handleFilter = (newFilters) => {
-    setFilters(newFilters);
-  };
+    const handleFilter = (newFilters) => {
+      setFilters(newFilters);
+    };
 
-  if (!isDBLoaded) {
-    return <Typography>Loading...</Typography>
-  }
+    if(!isDBLoaded) {
+      return <Typography>Loading...</Typography>
+    }
 
-  return (
+  return(
+    <ThemeProvider theme = { theme } >
+    <CssBaseline />
     <Container>
       <Typography variant="h4" gutterBottom>
         Planetary Resources Finder
@@ -45,7 +86,7 @@ function HomePage() {
       <Button variant="contained" color="primary" onClick={() => fetchDataFromAPI(filters)}>
         Submit
       </Button>
-      <Paper>
+      <Paper style={{ backgroundColor: '#3d3d3d' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -78,6 +119,7 @@ function HomePage() {
         </Table>
       </Paper>
     </Container>
+    </ThemeProvider >
   );
 }
 
