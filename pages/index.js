@@ -6,6 +6,23 @@ import SearchFilter from '../app/components/SearchFilter';
 function HomePage() {
   const [data, setData] = useState([]);
   const [filters, setFilters] = useState({});
+  const [isDBLoaded, setIsDBLoaded] = useState(false);
+
+  useEffect(() => {
+    // Check if the database has data or not
+    async function checkDB() {
+      const res = await fetch(`/api/fetchData`);
+      const result = await res.json();
+      if (result.length === 0) {
+        // If the database is empty, load the data
+        await fetch('/api/loadData');
+        setIsDBLoaded(true);
+      } else {
+        setIsDBLoaded(true);
+      }
+    }
+    checkDB();
+  }, []);
 
   const fetchDataFromAPI = async (filters) => {
     const queryParams = new URLSearchParams(filters).toString();
@@ -18,11 +35,14 @@ function HomePage() {
     setFilters(newFilters);
   };
 
+  if (!isDBLoaded) {
+    return <Typography>Loading...</Typography>
+  }
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
         Planetary Resources Finder
-
       </Typography>
 
       <SearchFilter onFilter={handleFilter} />
