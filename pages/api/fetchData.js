@@ -1,10 +1,12 @@
-import Datastore from 'nedb-promises';
+import path from 'path';
+import fs from 'fs';
 
-const db = Datastore.create({ filename: 'mydatabase.db', autoload: true });
-
-export default async (req, res) => {
+export default (req, res) => {
     try {
         console.log("Fetching data with filters:", req.query);
+
+        const publicDir = path.join(process.cwd(), 'public');
+        const jsonData = JSON.parse(fs.readFileSync(path.join(publicDir, 'integratedData.json')));
 
         let query = {};
 
@@ -18,11 +20,16 @@ export default async (req, res) => {
             query.System = new RegExp(req.query.system, 'i');
         }
 
-        console.log("Constructed query:", query);
+        console.log("Constructed query:", query);  // Added this for debugging
 
-        const data = await db.find(query);
+        let filteredData = jsonData.filter(item => {
+            for (let key in query) {
+                if (!query[key].test(item[key])) return false;
+            }
+            return true;
+        });
 
-        return res.status(200).json(data);
+        return res.status(200).json(filteredData.slice(0, 100));  // Limit the results to 100
 
     } catch (error) {
         console.error("Error in fetchData:", error);

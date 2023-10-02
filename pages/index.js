@@ -9,19 +9,15 @@ function HomePage() {
   const [isDBLoaded, setIsDBLoaded] = useState(false);
 
   useEffect(() => {
-    // Check if the database has data or not
-    async function checkDB() {
-      const res = await fetch(`/api/fetchData`);
-      const result = await res.json();
-      if (result.length === 0) {
-        // If the database is empty, load the data
+    async function loadDataIfNeeded() {
+      const checkRes = await fetch(`/api/checkDataExistence`);
+      const checkData = await checkRes.json();
+      if (!checkData.exists) {
         await fetch('/api/loadData');
-        setIsDBLoaded(true);
-      } else {
-        setIsDBLoaded(true);
       }
+      setIsDBLoaded(true);
     }
-    checkDB();
+    loadDataIfNeeded();
   }, []);
 
   const fetchDataFromAPI = async (filters) => {
